@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<file:config name="File_Config" doc:name="File Config" doc:id="568669f0-2711-4be5-8e99-63a8d232049c" />
+	<flow name="mule-file-operationsFlow" doc:id="01211b9d-7e9d-4044-bc75-0cb7c3e6af6f" >
+		<file:listener doc:name="On New or Updated File" doc:id="cf8ea3dd-9b1f-4a7f-9c25-844fdf8655ae" config-ref="File_Config" directory="/temp/files">
+			<scheduling-strategy >
+				<fixed-frequency timeUnit="MINUTES"/>
+			</scheduling-strategy>
+		</file:listener>
+	</flow>
+</mule>
