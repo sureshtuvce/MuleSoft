@@ -1,15 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<file:config name="File_Config" doc:name="File Config" doc:id="568669f0-2711-4be5-8e99-63a8d232049c" />
-	<flow name="mule-file-operationsFlow" doc:id="01211b9d-7e9d-4044-bc75-0cb7c3e6af6f" >
+	<flow name="mule-file-operations-default-file-config-flow" doc:id="01211b9d-7e9d-4044-bc75-0cb7c3e6af6f" >
 		<file:listener doc:name="On New or Updated File" doc:id="cf8ea3dd-9b1f-4a7f-9c25-844fdf8655ae" config-ref="File_Config" directory="/temp/files">
 			<scheduling-strategy >
 				<fixed-frequency timeUnit="MINUTES"/>
 			</scheduling-strategy>
 		</file:listener>
+		<ee:transform doc:name="Transform Message" doc:id="63b5c2ef-73f1-4bb5-80d0-0e02b6e11a21" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="5a15a92d-ab0f-490a-8780-040b9e269323" config-ref="File_Config" path="/temp/output"/>
+	</flow>
+	<flow name="mule-file-operations-file-cron-based-file-read-fow" doc:id="c66c850f-fec1-4400-bf46-fbba4ece8fd7" >
+		<file:listener doc:name="On New or Updated File" doc:id="84c32d04-68ca-44dc-a918-9e66d5ee50a1" config-ref="File_Config" directory="/temp/in" renameTo="#['/temp/archive' ++ (now().milliseconds) ++ '.json']">
+			<scheduling-strategy >
+				<cron expression="0 4 * * SUN" />
+			</scheduling-strategy>
+		</file:listener>
+		<ee:transform doc:name="Transform Message" doc:id="4d169411-218d-4596-a5fb-982ed8d9ee24" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<file:write doc:name="Write" doc:id="9aabbcae-23c0-4efa-919a-d57a837df7ec" config-ref="File_Config" path="/temp/output"/>
 	</flow>
 </mule>
